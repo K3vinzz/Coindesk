@@ -48,6 +48,20 @@ public class CurrenciesController : ControllerBase
     }
 
     /// <summary>
+    /// Get currency by Code.
+    /// </summary>
+    [HttpGet("code/{code}")]
+    public async Task<ActionResult<CurrencyDTO>> GetCurrencyByCode(string code)
+    {
+        var currency = await _context.Currencies.FirstOrDefaultAsync(c => c.Code == code);
+        if (currency == null)
+        {
+            return NotFound();
+        }
+        return _mapper.Map<CurrencyDTO>(currency);
+    }
+
+    /// <summary>
     /// Create a new currency record.
     /// </summary>
     /// <remarks>
@@ -87,12 +101,49 @@ public class CurrenciesController : ControllerBase
     }
 
     /// <summary>
+    /// Update the currency by Code.
+    /// </summary>
+    [HttpPut("code/{code}")]
+    public async Task<IActionResult> PutCurrency(string code, CurrencyDTO currencyDto)
+    {
+        var currency = await _context.Currencies.FirstOrDefaultAsync(c => c.Code == code);
+        if (currency == null)
+        {
+            return NotFound();
+        }
+
+        _mapper.Map(currencyDto, currency);
+        _context.Entry(currency).State = EntityState.Modified;
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+
+
+
+    /// <summary>
     /// Delete a curency by Id.
     /// </summary>
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteCurrency(int id)
     {
         var currency = await _context.Currencies.FindAsync(id);
+        if (currency == null)
+        {
+            return NotFound();
+        }
+
+        _context.Currencies.Remove(currency);
+        await _context.SaveChangesAsync();
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Delete a currency by Code.
+    /// </summary>
+    [HttpDelete("code/{code}")]
+    public async Task<IActionResult> DeleteCurrency(string code)
+    {
+        var currency = await _context.Currencies.FirstOrDefaultAsync(c => c.Code == code);
         if (currency == null)
         {
             return NotFound();
