@@ -1,0 +1,6 @@
+CREATE TABLE [Currencies] (
+          [Id] int NOT NULL IDENTITY,
+          [Code] nvarchar(max) NOT NULL,
+          [Name] nvarchar(max) NULL,
+          CONSTRAINT [PK_Currencies] PRIMARY KEY ([Id])
+      );
