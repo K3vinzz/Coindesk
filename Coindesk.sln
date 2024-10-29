@@ -7,6 +7,10 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{61A6D20E-348
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoindeskApi", "src\CoindeskApi\CoindeskApi.csproj", "{BB4811C2-F1EC-4FF6-87CA-BB5C689C3739}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{96AF370C-2F21-4BE2-82CB-FEBCE0745FAE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CoindeskApi.UnitTests", "tests\CoindeskApi.UnitTests\CoindeskApi.UnitTests.csproj", "{4CBB7F48-AED1-44A9-8863-EF1C90A64458}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -20,8 +24,13 @@ Global
 		{BB4811C2-F1EC-4FF6-87CA-BB5C689C3739}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BB4811C2-F1EC-4FF6-87CA-BB5C689C3739}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BB4811C2-F1EC-4FF6-87CA-BB5C689C3739}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CBB7F48-AED1-44A9-8863-EF1C90A64458}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CBB7F48-AED1-44A9-8863-EF1C90A64458}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CBB7F48-AED1-44A9-8863-EF1C90A64458}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CBB7F48-AED1-44A9-8863-EF1C90A64458}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{BB4811C2-F1EC-4FF6-87CA-BB5C689C3739} = {61A6D20E-3481-493A-BC8B-9C352DEF6814}
+		{4CBB7F48-AED1-44A9-8863-EF1C90A64458} = {96AF370C-2F21-4BE2-82CB-FEBCE0745FAE}
 	EndGlobalSection
 EndGlobal

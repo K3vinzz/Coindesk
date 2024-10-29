@@ -12,10 +12,14 @@ public class CoinDeskService
         _httpClient = httpClient;
     }
 
-    public async Task<CoinDeskResponse> GetCoinDeskDataAsync()
+    public async Task<CoinDeskResponse?> GetCoinDeskDataAsync()
     {
         var response = await _httpClient.GetAsync("https://api.coindesk.com/v1/bpi/currentprice.json");
-        response.EnsureSuccessStatusCode();
+        if (!response.IsSuccessStatusCode)
+        {
+            Console.WriteLine($"Error: Received status code {response.StatusCode}");
+            return null;
+        }
         var content = await response.Content.ReadAsStringAsync();
         return JsonConvert.DeserializeObject<CoinDeskResponse>(content)!;
     }

@@ -30,13 +30,46 @@ public class CoinDeskController : ControllerBase
 
         var result = new
         {
-            updatedISO = coinDeskData.Time?.UpdatedISO.ToString("yyyy/MM/dd HH:mm:ss"),
-            bpi = coinDeskData.Bpi?.Select(bpi => new
+            updatedISO = coinDeskData?.Time?.UpdatedISO.ToString("yyyy/MM/dd HH:mm:ss") ?? "Unknown",
+            bpi = coinDeskData?.Bpi?.Select(bpi => new
             {
                 Code = bpi.Value.Code,
                 Name = currencies.FirstOrDefault(c => c.Code == bpi.Value.Code)?.Name ?? "Unknown",
                 Rate = bpi.Value.Rate
             })
+        };
+
+        return Ok(result);
+    }
+
+    
+    /// <summary>
+    /// Get all converted data by Code.
+    /// </summary>
+    [HttpGet("code/{code}")]
+    public async Task<ActionResult> GetConvertedDataByCode(string code)
+    {
+        var coinDeskData = await _coinDeskService.GetCoinDeskDataAsync();
+        var currencies = await _context.Currencies.ToListAsync();
+
+        var bpiData = coinDeskData?.Bpi?
+            .Where(bpi => bpi.Value.Code.Equals(code, StringComparison.OrdinalIgnoreCase))
+            .Select(bpi => new
+                {
+                    Code = bpi.Value.Code,
+                    Name = currencies.FirstOrDefault(c => c.Code == bpi.Value.Code)?.Name ?? "Unknown",
+                    Rate = bpi.Value.Rate
+                });
+
+        if (bpiData == null || !bpiData.Any())
+        {
+            return NotFound(new { message = $"No data found for code '{code}'." });
+        }
+
+        var result = new
+        {
+            updatedISO = coinDeskData?.Time?.UpdatedISO.ToString("yyyy/MM/dd HH:mm:ss") ?? "Unknown",
+            bpi = bpiData
         };
 
         return Ok(result);
