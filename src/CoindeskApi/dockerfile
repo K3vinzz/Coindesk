@@ -8,6 +8,7 @@ EXPOSE 80
 
 COPY Coindesk.sln Coindesk.sln
 COPY src/CoindeskApi/CoindeskApi.csproj src/CoindeskApi/CoindeskApi.csproj
+COPY tests/CoindeskApi.UnitTests/CoindeskApi.UnitTests.csproj tests/CoindeskApi.UnitTests/
 
 RUN dotnet restore Coindesk.sln
 

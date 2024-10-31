@@ -6,14 +6,12 @@ namespace CoindeskApi.Data;
 
 public interface ICurrenciesRepository
 {
-    Task<IEnumerable<Currency>> GetCurrencies();
-    Task<Currency> GetCurrency(int id);
+    Task<List<Currency>> GetCurrencies();
+    Task<CurrencyDTO> GetCurrencyById(int id);
+    Task<Currency?> GetCurrencyModelById(int id);
     Task<CurrencyDTO> GetCurrencyByCode(string code);
+    Task<Currency?> GetCurrencyModelByCode(string code);
     void AddCurrency(Currency currency);
     void RemoveCurrency(Currency currency);
-    Task<bool> SaveChangeAsync();
-
-
-
-
+    Task<int> SaveChangesAsync();
 }

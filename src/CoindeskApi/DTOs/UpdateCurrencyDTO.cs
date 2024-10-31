@@ -1,6 +1,8 @@
+using System;
+
 namespace CoindeskApi.DTOs;
 
-public class CreateCurrencyDTO
+public class UpdateCurrencyDTO
 {
     public string? Code { get; set; }
     public string? Name { get; set; }

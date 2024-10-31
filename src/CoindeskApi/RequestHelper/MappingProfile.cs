@@ -12,5 +12,11 @@ public class MappingProfile : Profile
         CreateMap<CreateCurrencyDTO, Currency>();
         CreateMap<Currency, CreateCurrencyDTO>();
         CreateMap<Currency, CurrencyDTO>();
+        CreateMap<CurrencyDTO, Currency>();
+
+        CreateMap<CoinDeskResponse, CustomCoinDeskResponse>()
+            .ForMember(dest => dest.UpdatedISO, opt => opt.MapFrom(src => src.Time!.UpdatedISO))
+            .ForMember(dest => dest.Bpi, opt => opt.MapFrom(src => src.Bpi));
+        CreateMap<CurrencyInfo, CustomCurrencyInfo>();
     }
 }

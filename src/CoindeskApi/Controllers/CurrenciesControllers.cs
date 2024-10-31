@@ -12,12 +12,12 @@ namespace CoindeskApi.Controllers;
 [ApiController]
 public class CurrenciesController : ControllerBase
 {
-    private readonly CoinDbContext _context;
+    private readonly ICurrenciesRepository _repo;
     private readonly IMapper _mapper;
 
-    public CurrenciesController(CoinDbContext context, IMapper mapper)
+    public CurrenciesController(ICurrenciesRepository repo, IMapper mapper)
     {
-        _context = context;
+        _repo = repo;
         _mapper = mapper;
     }
 
@@ -25,9 +25,9 @@ public class CurrenciesController : ControllerBase
     /// Get all currencies.
     /// </summary>
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Currency>>> GetCurrencies()
+    public async Task<ActionResult<List<Currency>>> GetCurrencies()
     {
-        return await _context.Currencies.ToListAsync();
+        return await _repo.GetCurrencies();
     }
 
 
@@ -35,9 +35,9 @@ public class CurrenciesController : ControllerBase
     /// Get currency by Id.
     /// </summary>
     [HttpGet("{id}")]
-    public async Task<ActionResult<Currency>> GetCurrency(int id)
+    public async Task<ActionResult<CurrencyDTO>> GetCurrencyById(int id)
     {
-        var currency = await _context.Currencies.FindAsync(id);
+        var currency = await _repo.GetCurrencyById(id);
 
         if (currency == null)
         {
@@ -53,12 +53,12 @@ public class CurrenciesController : ControllerBase
     [HttpGet("code/{code}")]
     public async Task<ActionResult<CurrencyDTO>> GetCurrencyByCode(string code)
     {
-        var currency = await _context.Currencies.FirstOrDefaultAsync(c => c.Code == code);
+        var currency = await _repo.GetCurrencyByCode(code);
         if (currency == null)
         {
             return NotFound();
         }
-        return _mapper.Map<CurrencyDTO>(currency);
+        return currency;
     }
 
     /// <summary>
@@ -75,47 +75,67 @@ public class CurrenciesController : ControllerBase
     ///
     /// </remarks>
     [HttpPost]
-    public async Task<ActionResult<Currency>> PostCurrency(CreateCurrencyDTO currencyDto)
+    public async Task<ActionResult<CurrencyDTO>> AddCurrency(CreateCurrencyDTO currencyDto)
     {
         var currency = _mapper.Map<Currency>(currencyDto);
-        _context.Currencies.Add(currency);
-        await _context.SaveChangesAsync();
+        _repo.AddCurrency(currency);
+        var result = await _repo.SaveChangesAsync();
         var newCurrency = _mapper.Map<CurrencyDTO>(currency);
-        return CreatedAtAction(nameof(GetCurrency), new { id = newCurrency.Id }, newCurrency);
+        if (result == 0) return BadRequest("Fail to add currency.");
+        return CreatedAtAction(nameof(GetCurrencyById), new {id = newCurrency.Id}, newCurrency);
     }
 
     /// <summary>
     /// Update the Name of the currency by Id.
     /// </summary>
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutCurrency(int id, Currency currency)
+    public async Task<IActionResult> UpdateCurrencyById(int id, UpdateCurrencyDTO updateCurrencyDTO)
     {
-        if (id != currency.Id)
+        var currency = await _repo.GetCurrencyModelById(id);
+
+        if (currency == null)
         {
-            return BadRequest();
+            return NotFound();
+        }
+        else if (updateCurrencyDTO.Code == currency.Code && updateCurrencyDTO.Name == currency.Name)
+        {
+            return NoContent();
         }
 
-        _context.Entry(currency).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
-        return NoContent();
+        currency.Code = updateCurrencyDTO.Code ?? currency.Code;
+        currency.Name = updateCurrencyDTO.Name ?? currency.Name;
+
+        var result = await _repo.SaveChangesAsync();
+
+        if (result > 0) return Ok();
+
+        return BadRequest("Problem saving changes");
     }
 
     /// <summary>
     /// Update the currency by Code.
     /// </summary>
     [HttpPut("code/{code}")]
-    public async Task<IActionResult> PutCurrency(string code, CurrencyDTO currencyDto)
+    public async Task<IActionResult> UpdateCurrencyByCode(string code, string name)
     {
-        var currency = await _context.Currencies.FirstOrDefaultAsync(c => c.Code == code);
+        var currency = await _repo.GetCurrencyModelByCode(code);
+
         if (currency == null)
         {
             return NotFound();
         }
+        else if (currency.Name == name)
+        {
+            return NoContent();
+        }
 
-        _mapper.Map(currencyDto, currency);
-        _context.Entry(currency).State = EntityState.Modified;
-        await _context.SaveChangesAsync();
-        return NoContent();
+        currency.Name = name;
+
+        var result = await _repo.SaveChangesAsync();
+
+        if (result > 0) return Ok();
+
+        return BadRequest("Problem saving changes");
     }
 
 
@@ -124,33 +144,43 @@ public class CurrenciesController : ControllerBase
     /// Delete a curency by Id.
     /// </summary>
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteCurrency(int id)
+    public async Task<IActionResult> RemoveCurrencyById(int id)
     {
-        var currency = await _context.Currencies.FindAsync(id);
+        var currency = await _repo.GetCurrencyModelById(id);
+
         if (currency == null)
         {
             return NotFound();
         }
 
-        _context.Currencies.Remove(currency);
-        await _context.SaveChangesAsync();
-        return NoContent();
+        _repo.RemoveCurrency(currency);
+
+        var result = await _repo.SaveChangesAsync();
+
+        if (result > 0) return Ok();
+
+        return BadRequest("Problem saving changes");
     }
 
     /// <summary>
     /// Delete a currency by Code.
     /// </summary>
     [HttpDelete("code/{code}")]
-    public async Task<IActionResult> DeleteCurrency(string code)
+    public async Task<IActionResult> RemoveCurrencyByCode(string code)
     {
-        var currency = await _context.Currencies.FirstOrDefaultAsync(c => c.Code == code);
+        var currency = await _repo.GetCurrencyModelByCode(code);
+
         if (currency == null)
         {
             return NotFound();
         }
 
-        _context.Currencies.Remove(currency);
-        await _context.SaveChangesAsync();
-        return NoContent();
+        _repo.RemoveCurrency(currency);
+
+        var result = await _repo.SaveChangesAsync();
+
+        if (result > 0) return Ok();
+
+        return BadRequest("Problem saving changes");
     }
 }
